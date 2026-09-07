@@ -278,14 +278,19 @@ def save_output_file_to_db(file_name: str, file_bytes: bytes, file_type: str = "
 # ==============================================================================
 # SECTION 5: SESSION STATE DEFAULTS
 # ==============================================================================
+try:
+    sec_email = st.secrets.get("email", {})
+except Exception:
+    sec_email = {}
+
 DEFAULTS = {
     "fg_code": "FG500014",
     "col_map": "36:FG500014AJ\n37:FG500014AK",
     "agency_override": "101:36:FG500014N01\n101:37:FG500014N02",
     "route": "22",
-    "email_user": st.secrets.get("email", {}).get("sender_email", ""),
-    "email_pass": st.secrets.get("email", {}).get("app_password", ""),
-    "recipient": st.secrets.get("email", {}).get("recipient_email", ""),
+    "email_user": sec_email.get("sender_email", "") if isinstance(sec_email, dict) else "",
+    "email_pass": sec_email.get("app_password", "") if isinstance(sec_email, dict) else "",
+    "recipient": sec_email.get("recipient_email", "") if isinstance(sec_email, dict) else "",
     "whatsapp": "",
     "selected_theme": "💼 Classic Enterprise Navy",
     "processed_files": [],
@@ -295,7 +300,6 @@ DEFAULTS = {
     "unmapped_current_batch": [],
     "kpi_data": {"input_qty": 0, "gen_qty": 0, "valid_count": 0, "missing_count": 0, "skipped_count": 0}
 }
-
 for key, val in DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = val
