@@ -22,22 +22,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install streamlit pandas openpyxl pytz fpdf2 plotly pyinstaller
 
-    - name: Create launcher script
+    - name: Create robust launcher script
       run: |
         Set-Content -Path run.py -Value "import os"
         Add-Content -Path run.py -Value "import sys"
         Add-Content -Path run.py -Value "import streamlit.web.cli as stcli"
         Add-Content -Path run.py -Value "def resolve_path(path):"
-        Add-Content -Path run.py -Value "    if getattr(sys, 'frozen', False):"
+        Add-Content -Path run.py -Value "    if hasattr(sys, '_MEIPASS'):"
         Add-Content -Path run.py -Value "        return os.path.join(sys._MEIPASS, path)"
         Add-Content -Path run.py -Value "    return os.path.join(os.path.abspath('.'), path)"
         Add-Content -Path run.py -Value "if __name__ == '__main__':"
         Add-Content -Path run.py -Value "    app_path = resolve_path('app.py')"
+        Add-Content -Path run.py -Value "    print('Running app from:', app_path)"
         Add-Content -Path run.py -Value "    sys.argv = ['streamlit', 'run', app_path, '--global.developmentMode=false']"
         Add-Content -Path run.py -Value "    sys.exit(stcli.main())"
 
     - name: Build Standalone EXE
-      run: pyinstaller --console --onefile --name="SalesOrderAutomation" --add-data "Output.xlsx;." --collect-all streamlit run.py
+      run: pyinstaller --console --onefile --name="SalesOrderAutomation" --add-data "app.py;." --add-data "Output.xlsx;." --collect-all streamlit run.py
 
     - name: Upload Built EXE Artifact
       uses: actions/upload-artifact@v4
