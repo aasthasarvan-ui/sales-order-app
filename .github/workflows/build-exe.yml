@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Check out repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
 
     - name: Set up Python
@@ -17,30 +17,29 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install Dependencies
+    - name: Install PyInstaller and Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install streamlit pandas openpyxl pytz fpdf2 plotly pyinstaller
 
-    - name: Create launcher script (run.py)
+    - name: Create launcher script
       run: |
-        echo import os > run.py
-        echo import sys >> run.py
-        echo import streamlit.web.cli as stcli >> run.py
-        echo def resolve_path(path): >> run.py
-        echo     if getattr(sys, 'frozen', False): >> run.py
-        echo         return os.path.join(sys._MEIPASS, path) >> run.py
-        echo     return os.path.join(os.path.abspath("."), path) >> run.py
-        echo if __name__ == "__main__": >> run.py
-        echo     app_path = resolve_path("app.py") >> run.py
-        echo     sys.argv = ["streamlit", "run", app_path, "--global.developmentMode=false"] >> run.py
-        echo     sys.exit(stcli.main()) >> run.py
+        Set-Content -Path run.py -Value "import os"
+        Add-Content -Path run.py -Value "import sys"
+        Add-Content -Path run.py -Value "import streamlit.web.cli as stcli"
+        Add-Content -Path run.py -Value "def resolve_path(path):"
+        Add-Content -Path run.py -Value "    if getattr(sys, 'frozen', False):"
+        Add-Content -Path run.py -Value "        return os.path.join(sys._MEIPASS, path)"
+        Add-Content -Path run.py -Value "    return os.path.join(os.path.abspath('.'), path)"
+        Add-Content -Path run.py -Value "if __name__ == '__main__':"
+        Add-Content -Path run.py -Value "    app_path = resolve_path('app.py')"
+        Add-Content -Path run.py -Value "    sys.argv = ['streamlit', 'run', app_path, '--global.developmentMode=false']"
+        Add-Content -Path run.py -Value "    sys.exit(stcli.main())"
 
-    - name: Build EXE with PyInstaller
-      run: |
-        pyinstaller --noconsole --onefile --name="SalesOrderAutomation" --add-data "Output.xlsx;." run.py
+    - name: Build Standalone EXE
+      run: pyinstaller --noconsole --onefile --name="SalesOrderAutomation" --add-data "Output.xlsx;." run.py
 
-    - name: Upload EXE Artifact
+    - name: Upload Built EXE Artifact
       uses: actions/upload-artifact@v4
       with:
         name: SalesOrderAutomation-EXE
