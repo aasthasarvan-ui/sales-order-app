@@ -41,7 +41,7 @@ jobs:
         pyinstaller --noconsole --onefile --name="SalesOrderAutomation" --add-data "Output.xlsx;." run.py
 
     - name: Upload EXE Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: SalesOrderAutomation-EXE
         path: dist/SalesOrderAutomation.exe
