@@ -33,12 +33,11 @@ jobs:
         Add-Content -Path run.py -Value "    return os.path.join(os.path.abspath('.'), path)"
         Add-Content -Path run.py -Value "if __name__ == '__main__':"
         Add-Content -Path run.py -Value "    app_path = resolve_path('app.py')"
-        Add-Content -Path run.py -Value "    print('Running app from:', app_path)"
         Add-Content -Path run.py -Value "    sys.argv = ['streamlit', 'run', app_path, '--global.developmentMode=false']"
         Add-Content -Path run.py -Value "    sys.exit(stcli.main())"
 
     - name: Build Standalone EXE
-      run: pyinstaller --console --onefile --name="SalesOrderAutomation" --add-data "app.py;." --add-data "Output.xlsx;." --collect-all streamlit run.py
+      run: pyinstaller --console --onefile --name="SalesOrderAutomation" --add-data "app.py;." --add-data "Output.xlsx;." --collect-all streamlit --collect-all fpdf --collect-all pandas --collect-all openpyxl run.py
 
     - name: Upload Built EXE Artifact
       uses: actions/upload-artifact@v4
