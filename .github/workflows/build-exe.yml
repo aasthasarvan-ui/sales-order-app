@@ -37,7 +37,7 @@ jobs:
         Add-Content -Path run.py -Value "    sys.exit(stcli.main())"
 
     - name: Build Standalone EXE
-      run: pyinstaller --noconsole --onefile --name="SalesOrderAutomation" --add-data "Output.xlsx;." run.py
+      run: pyinstaller --noconsole --onefile --name="SalesOrderAutomation" --add-data "Output.xlsx;." --collect-all streamlit run.py
 
     - name: Upload Built EXE Artifact
       uses: actions/upload-artifact@v4
